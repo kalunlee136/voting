@@ -1,0 +1,11 @@
+<div class="col-md-6 col-md-offset-3" ng-init="init()">
+  <h2 style="text-align:center">{{title1}}</h2>
+  <form ng-submit="submitVote()">
+    <ul>
+        <li class="list-group-item" ng-repeat="choice in choices1">
+          <input type="radio" name=1 value={{choice.loc}}>{{choice.name}} 
+        </li>
+    </ul>
+    <button type="submit">Submit</button>
+  </form>
+</div>

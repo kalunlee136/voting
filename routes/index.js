@@ -2,9 +2,8 @@
 var passport = require('passport');
 var jwt = require('express-jwt');
 var auth = jwt({secret: 'SECRET', userProperty: 'payload'});
-var Post = require('../models/Posts');
-var Comment = require('../models/Comments');
-var User = require('../models/Users')
+var Poll = require('../models/Polls');
+//var Vote = require('../models/Votes');
 
 
 
@@ -15,52 +14,62 @@ module.exports = function(app){
     });
     
     //begin param post routes
-    app.param('post', function(req, res, next, id) {
-      var query = Post.findById(id);
     
-      query.exec(function (err, post){
+    app.get('/polls', function(req, res, next) {
+      Poll.find(function(err, polls){
+        if(err){ return next(err); }
+    
+        res.json(polls);
+      });
+    });
+    
+    app.post('/polls',function(req, res, next) {
+      var poll = new Poll(req.body);
+      //poll.author = req.payload.username;
+      
+      poll.save(function(err, poll){
+        if(err){ return next(err); }
+    
+        res.json(poll);
+      });
+    });
+    
+    app.param('id', function(req, res, next, id) {
+      var query = Poll.findById(id);
+    
+      query.exec(function (err, poll){
         if (err) { return next(err); }
-        if (!post) { return next(new Error('can\'t find post')); }
+        if (!poll) { return next(new Error('can\'t find comment')); }
     
-        req.post = post;
+        req.poll = poll;
         return next();
       });
     });
     
-    app.get('/posts', function(req, res, next) {
-      Post.find(function(err, posts){
-        if(err){ return next(err); }
-    
-        res.json(posts);
-      });
-    });
-    
-    app.post('/posts', auth, function(req, res, next) {
-      var post = new Post(req.body);
-      post.author = req.payload.username;
-      
-      post.save(function(err, post){
-        if(err){ return next(err); }
-    
-        res.json(post);
-      });
-    });
-    
-    app.get('/posts/:post', function(req, res) {
-      req.post.populate('comments', function(err, post) {
-        if (err) { return next(err); }
-    
-        res.json(post);
-      });
+    app.get('/polls/:id', function(req, res, next) {
+       res.json(req.poll);
     });
     
     //end param post routes
-    app.put('/posts/:post/upvote', auth, function(req, res, next) {
-      req.post.upvote(function(err, post){
-        if (err) { return next(err); }
-        
-        res.json(post);
+    app.put('/polls/:id', function(req, res, next) {
+      //req.poll.choices[req.body.index].upvote += 1;
+      
+      Poll.findById(req.params.id, function(err, p) {
+        if (!p)
+          return next(new Error('Could not load Document'));
+        else {
+          // do your updates here
+         
+          p.choices = req.body.choices;
+          
+          p.save(function(err){
+            if(err) throw(err);
+            
+            res.json(p);
+          });
+        }
       });
+      
     });
     
     //begin param comment routes

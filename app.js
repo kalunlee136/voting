@@ -15,10 +15,7 @@ app.set('view engine', 'ejs');
 
 //connect to mongoDB server
 var mongoose = require('mongoose');
-require('./models/Posts');
-require('./models/Comments');
-require('./models/Users');
-require('./config/passport');
+require('./models/Polls');
 
 mongoose.connect('mongodb://localhost/news');
 
