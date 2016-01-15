@@ -1,4 +1,4 @@
-var app = angular.module('flapperNews', ['ui.router']);
+var app = angular.module('votingApp', ['ui.router']);
 
 app.controller('MainCtrl', ['$scope','$http','$state','$stateParams', function($scope,$http,$state,$stateParams){
 
