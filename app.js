@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 
+var port = process.env.port || 8080
 var routes = require('./routes/index');
 
 var app = express();
@@ -30,4 +31,5 @@ app.use(passport.initialize());
 
 routes(app);
 
-module.exports = app;
+app.listen(port);
+console.log("App listening on port "+port);

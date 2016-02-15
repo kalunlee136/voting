@@ -1,13 +1,14 @@
 var mongoose = require('mongoose');
 
+//currently not used for anything
 var VoteSchema = new mongoose.Schema({
     title:String,
-    upvotes: {type: Number, default: 0},
+    y: {type: Number, default: 0},
     
 });
 
 VoteSchema.methods.upvote = function(cb){
-    this.upvotes += 1;
+    this.y += 1;
     this.save(cb);
 }
 
