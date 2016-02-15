@@ -29,6 +29,7 @@ app.controller('MainCtrl', ['$scope','$http','$state','$stateParams', function($
       window.location.href='https://voting-kalunlee136.c9users.io/#/polls/'+$stateParams.id+'/r'
     }
     
+    
     return $http.get('/polls/' + $stateParams.id).then(function(res){
       $scope.title1 = res.data.title;
       $scope.choices1 = res.data.choices;
