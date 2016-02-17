@@ -33,7 +33,7 @@ app.controller('MainCtrl', ['$scope','$http','$state','$stateParams', function($
       $scope.title1 = res.data.title;
       $scope.choices1 = res.data.choices;
       $scope.total = 0;
-      $scope.linke = 'https://blooming-taiga-52204.herokuapp.com//#/polls/'+$stateParams.id;
+      $scope.linke = 'https://blooming-taiga-52204.herokuapp.com/#/polls/'+$stateParams.id;
       $scope.choices1.forEach(function(item){
         $scope.total += item.upvote;
       })
@@ -50,7 +50,7 @@ app.controller('MainCtrl', ['$scope','$http','$state','$stateParams', function($
       .success(function(res){
         console.log(res);
         localStorage.setItem($stateParams.id,true);
-        window.location.href='https://blooming-taiga-52204.herokuapp.com//#/polls/'+$stateParams.id+'/r'
+        window.location.href='https://blooming-taiga-52204.herokuapp.com/#/polls/'+$stateParams.id+'/r'
       })
       .error(function(err){
         console.log(err);
