@@ -17,7 +17,7 @@ app.controller('MainCtrl', ['$scope','$http','$state','$stateParams', function($
   $scope.createPoll = function(){
     $http.post('/polls',{'title':$scope.title,'choices':$scope.choices})
       .success(function(data){
-          window.location.href='https://voting-kalunlee136.c9users.io/#/polls/'+data._id;
+          window.location.href='https://blooming-taiga-52204.herokuapp.com/#/polls/'+data._id;
       })
       .error(function(err){
         console.log(err);
@@ -26,14 +26,14 @@ app.controller('MainCtrl', ['$scope','$http','$state','$stateParams', function($
   
   $scope.init = function(){
     if(localStorage[$stateParams.id]){
-      window.location.href='https://voting-kalunlee136.c9users.io/#/polls/'+$stateParams.id+'/r'
+      window.location.href='https://blooming-taiga-52204.herokuapp.com/#/polls/'+$stateParams.id+'/r'
     }
     
     return $http.get('/polls/' + $stateParams.id).then(function(res){
       $scope.title1 = res.data.title;
       $scope.choices1 = res.data.choices;
       $scope.total = 0;
-      $scope.linke = 'https://voting-kalunlee136.c9users.io/#/polls/'+$stateParams.id;
+      $scope.linke = 'https://blooming-taiga-52204.herokuapp.com//#/polls/'+$stateParams.id;
       $scope.choices1.forEach(function(item){
         $scope.total += item.upvote;
       })
@@ -50,7 +50,7 @@ app.controller('MainCtrl', ['$scope','$http','$state','$stateParams', function($
       .success(function(res){
         console.log(res);
         localStorage.setItem($stateParams.id,true);
-        window.location.href='https://voting-kalunlee136.c9users.io/#/polls/'+$stateParams.id+'/r'
+        window.location.href='https://blooming-taiga-52204.herokuapp.com//#/polls/'+$stateParams.id+'/r'
       })
       .error(function(err){
         console.log(err);
