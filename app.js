@@ -18,7 +18,8 @@ app.set('view engine', 'ejs');
 var mongoose = require('mongoose');
 require('./models/Polls');
 
-mongoose.connect('mongodb://localhost/news');
+//mongoose.connect('mongodb://localhost/news');
+mongoose.connect('mongodb://kalunlee136:564213ab@ds011278.mongolab.com:11278/voter');
 
 
 // uncomment after placing your favicon in /public

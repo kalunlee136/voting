@@ -5,6 +5,7 @@ var gulp    = require('gulp'),
     
 var buildProduction = util.env.production;
 
+// use for bundling: gulp build --dev or --production
 gulp.task("build", function() {
    if (buildProduction) {
      gulp.start('production');
