@@ -1,0 +1,4 @@
+<div ng-repeat="poll in userPolls">
+    <a ng-href='/#/polls/{{poll._id}}/r'>{{poll.title}}</a>
+    <button ng-click="deletePoll(poll._id,$index)">delete</button>
+</div>

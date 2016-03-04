@@ -1,1 +1,203 @@
-var app=angular.module("votingApp",["ui.router"]);app.controller("MainCtrl",["$scope","$http","$state","$stateParams",function(o,e,t,r){o.choices=[{loc:0,upvote:0},{loc:1,upvote:0},{loc:2,upvote:0}],o.addNewChoice=function(){var e=o.choices.length;o.choices.push({loc:e,upvote:0}),console.log(o.choices)},o.showAddChoice=function(e){return e.loc===o.choices[o.choices.length-1].loc},o.createPoll=function(){e.post("/polls",{title:o.title,choices:o.choices}).success(function(o){window.location.href="https://blooming-taiga-52204.herokuapp.com/#/polls/"+o._id}).error(function(o){console.log(o)})},o.init=function(){return localStorage[r.id]&&(window.location.href="https://blooming-taiga-52204.herokuapp.com/#/polls/"+r.id+"/r"),e.get("/polls/"+r.id).then(function(e){o.title1=e.data.title,o.choices1=e.data.choices,o.total=0,o.linke="https://blooming-taiga-52204.herokuapp.com/#/polls/"+r.id,o.choices1.forEach(function(e){o.total+=e.upvote}),console.log(o.total)})},o.submitVote=function(){return o.choiceIndex=$("input[type='radio']:checked").val(),o.choices1[o.choiceIndex].upvote+=1,e.put("/polls/"+r.id,{choices:o.choices1}).success(function(o){console.log(o),localStorage.setItem(r.id,!0),window.location.href="https://blooming-taiga-52204.herokuapp.com/#/polls/"+r.id+"/r"}).error(function(o){console.log(o)})}}]),app.controller("AuthCtrl",["$scope","$state","auth",function(o,e,t){o.user={},o.register=function(){t.register(o.user).error(function(e){o.error=e}).then(function(){e.go("home")})},o.logIn=function(){t.logIn(o.user).error(function(e){o.error=e}).then(function(){e.go("home")})}}]),app.controller("NavCtrl",["$scope","auth",function(o,e){o.isLoggedIn=e.isLoggedIn,o.currentUser=e.currentUser,o.logOut=e.logOut}]),app.factory("auth",["$http","$window",function(o,e){var t={};return t.saveToken=function(o){e.localStorage["flapper-news-token"]=o},t.getToken=function(){return e.localStorage["flapper-news-token"]},t.isLoggedIn=function(){var o=t.getToken();if(o){var r=JSON.parse(e.atob(o.split(".")[1]));return r.exp>Date.now()/1e3}return!1},t.currentUser=function(){if(t.isLoggedIn()){var o=t.getToken(),r=JSON.parse(e.atob(o.split(".")[1]));return r.username}},t.register=function(e){return o.post("/register",e).success(function(o){t.saveToken(o.token)})},t.logIn=function(e){return o.post("/login",e).success(function(o){t.saveToken(o.token)})},t.logOut=function(){e.localStorage.removeItem("flapper-news-token")},t}]),app.config(["$stateProvider","$urlRouterProvider",function(o,e){o.state("poll",{url:"",views:{header:{templateUrl:"/partials/header.html"},body:{templateUrl:"partials/home.html",controller:"MainCtrl"}}}).state("polls",{url:"/polls/:id",views:{header:{templateUrl:"/partials/header.html"},body:{templateUrl:"partials/poll.html",controller:"MainCtrl"}}}).state("r",{url:"/polls/:id/r",views:{header:{templateUrl:"/partials/header.html"},body:{templateUrl:"partials/result.html",controller:"MainCtrl"}}}),e.otherwise("")}]);
+var app = angular.module('votingApp', ['ui.router']);
+
+app.controller('MainCtrl', ['$scope','$http','$state','$stateParams', function($scope,$http,$state,$stateParams){
+
+  $scope.choices = [{loc: 0,upvote:0}, {loc: 1,upvote:0}, {loc: 2,upvote:0}];
+  
+  $scope.addNewChoice = function() {
+    var newItemNo = $scope.choices.length;
+    $scope.choices.push({'loc':newItemNo,'upvote':0});
+    console.log($scope.choices);
+  };
+  
+  $scope.showAddChoice = function(choice) {
+    return choice.loc === $scope.choices[$scope.choices.length-1].loc;
+  };
+  
+  $scope.createPoll = function(){
+    $http.post('/polls',{'title':$scope.title,'choices':$scope.choices})
+      .success(function(data){
+        var url = $state.href('polls');
+        window.location.href= url + data._id;
+          
+      })
+      .error(function(err){
+        console.log(err);
+      })
+  }
+  
+  $scope.init = function(){
+    if(localStorage[$stateParams.id]){
+      var url = $state.href('polls');
+      window.location.href= url + $stateParams.id + '/r'
+    }
+    
+    return $http.get('/polls/' + $stateParams.id).then(function(res){
+      $scope.title1 = res.data.title;
+      $scope.choices1 = res.data.choices;
+      $scope.total = 0;
+      var url = $state.href('polls');
+      $scope.linke = url + $stateParams.id;
+      $scope.choices1.forEach(function(item){
+        $scope.total += item.upvote;
+      })
+      console.log($scope.total)
+    });
+    
+    
+  }
+  
+  $scope.submitVote = function(){
+    $scope.choiceIndex = $("input[type='radio']:checked").val();
+    $scope.choices1[$scope.choiceIndex].upvote +=1;
+    
+    return $http.put('/polls/'+$stateParams.id,{'choices':$scope.choices1})
+      .success(function(res){
+        console.log(res);
+        localStorage.setItem($stateParams.id,true);
+        var url = $state.href('polls');
+        window.location.href= url + $stateParams.id + '/r'
+      })
+      .error(function(err){
+        console.log(err);
+      })
+    
+  }
+  
+}]);
+
+app.controller('AuthCtrl', ['$scope','$state','auth', function($scope, $state, auth){
+  $scope.user = {};
+
+  $scope.register = function(){
+    auth.register($scope.user).error(function(error){
+      $scope.error = error;
+    }).then(function(){
+      $state.go('home');
+    });
+  };
+
+  $scope.logIn = function(){
+    auth.logIn($scope.user).error(function(error){
+      $scope.error = error;
+    }).then(function(){
+      $state.go('home');
+    });
+  };
+  
+}]);
+
+app.controller('NavCtrl', ['$scope','auth',function($scope, auth){
+  $scope.isLoggedIn = auth.isLoggedIn;
+  $scope.currentUser = auth.currentUser;
+  $scope.logOut = auth.logOut;
+}]);
+
+app.factory('auth', ['$http', '$window', function($http, $window){
+   var auth = {};
+   
+   auth.saveToken = function (token){
+     $window.localStorage['vote-app-token'] = token;
+   };
+  
+   auth.getToken = function (){
+     return $window.localStorage['vote-app-token'];
+   }
+   
+   auth.isLoggedIn = function(){
+     var token = auth.getToken();
+     
+     if(token){
+       var payload = JSON.parse($window.atob(token.split('.')[1]));
+       return payload.exp > Date.now() / 1000;
+     } else {
+       return false;
+     }
+   };
+   
+   auth.currentUser = function(){
+      if(auth.isLoggedIn()){
+        var token = auth.getToken();
+        var payload = JSON.parse($window.atob(token.split('.')[1]));
+    
+        return payload.username;
+      }
+    };
+   
+   auth.register = function(user){
+      return $http.post('/register', user).success(function(data){
+        auth.saveToken(data.token);
+      });
+    };
+   
+   auth.logIn = function(user){
+      return $http.post('/login', user).success(function(data){
+        auth.saveToken(data.token);
+      });
+    };
+   
+   auth.logOut = function(){
+      $window.localStorage.removeItem('vote-app-token');
+    };
+
+   return auth;
+}]);
+app.config(['$stateProvider','$urlRouterProvider',function($stateProvider, $urlRouterProvider) {
+    $stateProvider
+      .state('home', {
+        url: '',
+        views:{
+          'header':{templateUrl:'/partials/header.html'},
+          'body':{templateUrl: 'partials/home.html', controller: 'MainCtrl'}
+        }
+      })
+      
+      .state('poll', {
+        url: '',
+        views:{
+          'header':{templateUrl:'/partials/header.html'},
+          'body':{templateUrl: 'partials/home.html', controller: 'MainCtrl'}
+        }
+      })
+      
+      .state('polls', {
+        url: '/polls/:id',
+        views:{
+          'header':{templateUrl:'/partials/header.html'},
+          'body':{templateUrl: 'partials/poll.html', controller: 'MainCtrl'}
+        }
+      })
+      
+      .state('r', {
+        url: '/polls/:id/r',
+        views:{
+          'header':{templateUrl:'/partials/header.html'},
+          'body':{templateUrl: 'partials/result.html', controller: 'MainCtrl'}
+        }
+      })
+  
+    $urlRouterProvider.otherwise('');
+}]);
+
+
+
+app.controller('AuthCtrl', ['$scope','$state','auth', function($scope, $state, auth){
+  $scope.user = {};
+
+  $scope.register = function(){
+    auth.register($scope.user).error(function(error){
+      $scope.error = error;
+    }).then(function(){
+      $state.go('home');
+    });
+  };
+
+  $scope.logIn = function(){
+    auth.logIn($scope.user).error(function(error){
+      $scope.error = error;
+    }).then(function(){
+      $state.go('home');
+    });
+  };
+  
+}]);

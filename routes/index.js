@@ -1,8 +1,8 @@
-//var mongoose = require('mongoose');
 var passport = require('passport');
 var jwt = require('express-jwt');
 var auth = jwt({secret: 'SECRET', userProperty: 'payload'});
 var Poll = require('../models/Polls');
+var User = require('../models/Users')
 //var Vote = require('../models/Votes');
 
 
@@ -20,17 +20,33 @@ module.exports = function(app){
         if(err){ return next(err); }
     
         res.json(polls);
+      }).limit(5);
+    });
+    
+    app.get('/users/polls', auth, function(req, res, next) {
+      User.findById(req.payload._id, function(err, user) {
+        if(err) return next(err);
+        
+        user.populate('polls', function(err, polls){
+          if(err) console.log(err);
+          
+          res.json(polls.polls);
+        })
+        
       });
     });
     
-    app.post('/polls',function(req, res, next) {
+    app.post('/polls', auth, function(req, res, next) {
       var poll = new Poll(req.body);
-      //poll.author = req.payload.username;
-      
       poll.save(function(err, poll){
         if(err){ return next(err); }
-    
-        res.json(poll);
+        
+          User.findById(req.payload._id, function(err, user){
+            user.polls.push(poll);
+            user.save(function(err,u){
+              res.json(poll);
+            })
+          });
       });
     });
     
@@ -50,10 +66,8 @@ module.exports = function(app){
        res.json(req.poll);
     });
     
-    //end param post routes
     app.put('/polls/:id', function(req, res, next) {
-      //req.poll.choices[req.body.index].upvote += 1;
-      
+     
       Poll.findById(req.params.id, function(err, p) {
         if (!p)
           return next(new Error('Could not load Document'));
@@ -72,42 +86,9 @@ module.exports = function(app){
       
     });
     
-    //begin param comment routes
-     app.param('comment', function(req, res, next, id) {
-      var query = Comment.findById(id);
-    
-      query.exec(function (err, comment){
-        if (err) { return next(err); }
-        if (!comment) { return next(new Error('can\'t find comment')); }
-    
-        req.comment = comment;
-        return next();
-      });
-     });
-     
-     app.post('/posts/:post/comments', auth , function(req, res, next) {
-      var comment = new Comment(req.body);
-      comment.post = req.post;
-      comment.author = req.payload.username;
-    
-      comment.save(function(err, comment){
-        if(err){ return next(err); }
-    
-        req.post.comments.push(comment);
-        req.post.save(function(err, post) {
-          if(err){ return next(err); }
-    
-          res.json(comment);
-        });
-      });
-     });
-    
-     app.put('/posts/:post/comments/:comment/upvote', auth, function(req, res, next) {
-        req.comment.upvote(function(err, comment){
-        if (err) { return next(err); }
-        
-        res.json(comment);
-      });
+    app.delete('/polls/:id',auth,function(req,res,next){
+      var poll = req.poll;
+      poll.remove();
     });
     
     app.post('/register', function(req, res, next){

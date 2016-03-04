@@ -1,10 +1,19 @@
 var gulp    = require('gulp'),
+    nodemon = require('gulp-nodemon'),
     util   = require('gulp-util'),
     concat  = require('gulp-concat'),
     uglify  = require('gulp-uglify');
     
 var buildProduction = util.env.production;
 
+gulp.task('start', function(){
+   nodemon({
+       script:'app.js',
+       ext:'js html',
+       env:{'NODE_ENV':'development'},
+    })
+ });
+ 
 // use for bundling: gulp build --dev or --production
 gulp.task("build", function() {
    if (buildProduction) {
@@ -30,3 +39,4 @@ gulp.task('production', function() {
             .pipe(uglify())
             .pipe(gulp.dest('./public/build/js'));
 });
+
