@@ -62,21 +62,13 @@ app.controller('MainCtrl', ['$scope','$http','$state','$stateParams','polls', 'a
       })
   }
   
-  function getRandomColor() {
-      var letters = '0123456789ABCDEF'.split('');
-      var color = '#';
-      for (var i = 0; i < 6; i++ ) {
-          color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color;
-  }
-  
   $scope.init = function(){
     if(localStorage[$stateParams.id]){
-      var url = $state.href('polls');
-      window.location.href= url + $stateParams.id + '/r'
+      var url = $state.href('r', {id:$stateParams.id});
+      console.log('url', url , $stateParams.id);
+      window.location.href= url;
+
     }
-    
     return $http.get('/polls/' + $stateParams.id).then(function(res){
       var doughnutData = []; // Doughnut Chart Data
       $scope.title1 = res.data.title;
@@ -84,7 +76,6 @@ app.controller('MainCtrl', ['$scope','$http','$state','$stateParams','polls', 'a
       $scope.total = 0;
       
       //var url = $state.href('polls', {} , {absolute: true});
-
       $scope.choices1.forEach(function(item){
         var randomColor = getRandomColor();
         doughnutData.push({ value: item.upvote, label: item.name, color: randomColor})
@@ -99,7 +90,6 @@ app.controller('MainCtrl', ['$scope','$http','$state','$stateParams','polls', 'a
       document.getElementById('js-legend').innerHTML = mydoughnutChart.generateLegend();
       
     }); 
-    
     
   }
   
@@ -233,3 +223,12 @@ app.factory('auth', ['$http', '$window', function($http, $window){
 
    return auth;
 }]);
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}

@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
@@ -19,8 +20,8 @@ var mongoose = require('mongoose');
 require('./models/Polls');
 require('./models/Users');
 require('./config/passport');
-//mongoose.connect('mongodb://localhost/news');
-mongoose.connect('mongodb://kalunlee136:564213ab@ds011278.mongolab.com:11278/voter');
+mongoose.connect(process.env.DB_DEV);
+//mongoose.connect(process.env.PROD);
 
 
 // uncomment after placing your favicon in /public
@@ -28,6 +29,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 

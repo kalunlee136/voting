@@ -3,9 +3,6 @@ var jwt = require('express-jwt');
 var auth = jwt({secret: 'SECRET', userProperty: 'payload'});
 var Poll = require('../models/Polls');
 var User = require('../models/Users')
-//var Vote = require('../models/Votes');
-
-
 
 module.exports = function(app){
     /* GET home page. */

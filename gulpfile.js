@@ -1,8 +1,10 @@
-var gulp    = require('gulp'),
-    nodemon = require('gulp-nodemon'),
-    util   = require('gulp-util'),
-    concat  = require('gulp-concat'),
-    uglify  = require('gulp-uglify');
+var gulp      = require('gulp'),
+    nodemon   = require('gulp-nodemon'),
+    util      = require('gulp-util'),
+    concat    = require('gulp-concat'),
+    uglify    = require('gulp-uglify'),
+    browserify = require('browserify'),
+    source    = require('vinyl-source-stream');
     
 var buildProduction = util.env.production;
 
@@ -20,23 +22,30 @@ gulp.task("build", function() {
      gulp.start('production');
      
    } else {
-     gulp.start('dev');
+     gulp.start('jsBrowserify');
    }
    
 });
 // concats all javascript files in public folder to one file
 // and removes all white space.
 
-gulp.task('dev', function() {
+gulp.task('concatInterface', function() {
     return  gulp.src(['./public/javascripts/*.js'])
-            .pipe(concat('app.js'))
-            .pipe(gulp.dest('./public/build/js'));
+            .pipe(concat('build.js'))
+            .pipe(gulp.dest('./build/js'));
 });
 
-gulp.task('production', function() {
+gulp.task('jsBrowserify', ['concatInterface'] , function() {
+  return browserify({ entries: ['./build/js/build.js'] })
+    .bundle()
+    .pipe(source('build.js'))
+    .pipe(gulp.dest('./build/js'));
+});
+
+gulp.task('production',["jsBrowserify"], function() {
     return  gulp.src(['./public/javascripts/*.js'])
-            .pipe(concat('app.js'))
+            .pipe(concat('build.js'))
             .pipe(uglify())
-            .pipe(gulp.dest('./public/build/js'));
+            .pipe(gulp.dest('./build/js'));
 });
 
